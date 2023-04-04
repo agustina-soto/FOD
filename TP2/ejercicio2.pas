@@ -127,7 +127,7 @@ begin
 		read(mae, a); // Lee un registro del archivo maestro
 
 		while (a.cod <> a_det.cod) do begin
-			if (not eof(mae)) then
+			if (not eof(mae)) then // me tiraba runtime error 100 hasta que le agregue esto... por que?????????????
 				read(mae, a); // Mientras no encuentre al alumno a_cod se lo sigue buscando en el maestro (por definicion existe en él, no va a llegar a eof)
 		end;
 
