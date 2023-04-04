@@ -126,8 +126,10 @@ begin
 	while(a_det.cod <> valorAlto) do begin
 		read(mae, a); // Lee un registro del archivo maestro
 
-		while (a.cod <> a_det.cod) do
-			read(mae, a); // Mientras no encuentre al alumno a_cod se lo sigue buscando en el maestro (por definicion existe en él, no va a llegar a eof)
+		while (a.cod <> a_det.cod) do begin
+			if (not eof(mae)) then
+				read(mae, a); // Mientras no encuentre al alumno a_cod se lo sigue buscando en el maestro (por definicion existe en él, no va a llegar a eof)
+		end;
 
 		writeln('salio del while que busca el maestro');
 
@@ -138,13 +140,20 @@ begin
 
 		writeln('salio del while que busca todos los alumnos detalle con un codigo especifico');
 
-		seek (mae, filepos(mae) -1 ); // Reubica el puntero: cuando se buscaba el cod del maestro el puntero quedo avanzado
+		seek (mae, filepos(mae)-1 ); // Reubica el puntero: cuando se buscaba el cod del maestro el puntero quedo avanzado
 		
 		writeln('hizo el seek');
-		
+
 		write(mae, a); // Escribe la actualizacion en el archivo maestro
 		
-		writeln('saliendo del while grande...');
+		writeln('saliendo del while porque cambio el codigo detalle');
+
+		if (eof(mae)) then
+			writeln('maestro en eof');
+		if (eof(det)) then
+			writeln('detalleen eof');
+		if (a_det.cod = valorAlto) then
+			writeln('codigo de detalle = valor alto');
 	end;
 
 	writeln('salio del while porque cod = valor alto');
