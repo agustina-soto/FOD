@@ -143,8 +143,6 @@ var
 	txt: text;
 	a: alumno;
 begin
-	writeln('entro a listar alumnos');
-
 	assign(txt,'alumnos_con_mas_de_4_cursadas.txt');
 	rewrite(txt);
 	reset(mae);
