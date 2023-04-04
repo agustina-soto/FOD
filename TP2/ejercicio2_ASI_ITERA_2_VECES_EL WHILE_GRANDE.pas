@@ -1,3 +1,7 @@
+// me tiraba runtime error 106 hasta que junte los campos nombre y apellido --> ??
+// me tiraba runtime error 100 para leer el maestro hasta que agregue una linea para chequear que no sea eof --> ?? si tengo algo en detalle, tengo algo en maestro...
+
+
 {1. Se dispone de un archivo con información de los alumnos de la Facultad de Informática.
 
 	Por cada alumno se dispone de su código de alumno, apellido, nombre, cantidad de materias
