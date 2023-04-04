@@ -147,15 +147,20 @@ begin
 	rewrite(txt);
 	reset(mae);
 	
-	writeln('Alumnos con más de cuatro materias con cursada aprobada pero no aprobaron el final: ');
-	
+	writeln('Alumnos con mas de 4 materias con cursada aprobada pero no aprobaron el final: ');
+
 	while (not eof(mae)) do begin
 		read(mae, a);
-		if (a.cantCursadasAprobadas > 4) then begin
-			writeln(' - Nombre y apellido: ',a.nomYape);
-			writeln(txt,'Codigo de alumno: ',a.cod,' - Cantidad de cursadas aprobadas: ',a.cantCursadasAprobadas,' - Cantidad de finales aprobados: ',a.cantFinalesAprobados);
+		with a do begin
+			if (cantCursadasAprobadas > 4) then begin
+				writeln(txt,' - Nombre y apellido: ',nomYape);
+				writeln(txt,'Codigo de alumno: ',cod,' - Cantidad de cursadas aprobadas: ',cantCursadasAprobadas,' - Cantidad de finales aprobados: ',cantFinalesAprobados);		
+				writeln('Codigo: ',cod,' - Cantidad de cursadas aprobadas: ',cantCursadasAprobadas,' - Cantidad de finales aprobados: ',cantFinalesAprobados);		
+				writeln('Nombre y apellido: ',nomYape);
+			end;
 		end;
 	end;
+
 	close(txt); close(mae);
 end;
 
