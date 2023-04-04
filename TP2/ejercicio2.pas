@@ -1,28 +1,16 @@
-{
-
-
-
-        NO FUNCIONA. ME TIRA QUE NO PUEDO LEER SOBRE UN ARCHIVO DE TEXTO :(
-
-
-
-}
-
-
-
 {1. Se dispone de un archivo con información de los alumnos de la Facultad de Informática.
-	
+
 	Por cada alumno se dispone de su código de alumno, apellido, nombre, cantidad de materias
 	(cursadas) aprobadas sin final y cantidad de materias con final aprobado.
-	
+
 	Además, se tiene un archivo detalle con el código de alumno e información correspondiente a una materia
 	(esta información indica si aprobó la cursada o aprobó el final).
-	
+
 	Todos los archivos están ordenados por código de alumno y en el archivo detalle puede haber 0, 1 ó más 
 	registros por cada alumno del archivo maestro.
-	
+
 	Se pide realizar un programa con opciones para:
-	
+
 a. Actualizar el archivo maestro de la siguiente manera:
 	i.Si aprobó el final se incrementa en uno la cantidad de materias con final aprobado.
 	ii.Si aprobó la cursada se incrementa en uno la cantidad de materias aprobadas sin final.
@@ -37,18 +25,19 @@ const
 	valorAlto = -1;
 type
 	cadena30 = string[30];
+	rango = 0..1;
 
 	alumno = record
 		cod: integer;
 		apellido: cadena30;
 		nombre: cadena30;
-		cantMateriasAprobadas: integer;
+		cantCursadasAprobadas: integer;
 		cantFinalesAprobados: integer;
 	end;
 
 	alumnoDet = record
 		cod: integer;
-		aproboFinal: boolean;
+		aproboFinal: rango; // 0 = final aprobado ; 1 = cursada aprobada
 	end;
 
 	// Odenados por código de alumno
@@ -69,13 +58,14 @@ begin
 
 	while (not eof(txt)) do begin
 		with a do begin
-			readln(txt, cod, apellido);
-			readln(txt, cantMateriasAprobadas, cantFinalesAprobados, nombre);
+			readln(txt, cod, cantCursadasAprobadas, cantFinalesAprobados);
+			readln(txt, apellido);
+			readln(txt, nombre);
 			write(mae, a); // Escribe en el archivo binario
 		end;
 	end;
 
-	close(txt);		close(mae);
+	close(txt);	close(mae);
 end;
 
 
@@ -85,6 +75,8 @@ var
 	a_det: alumnoDet;
 	txt: text;
 begin
+	writeln('entro a crear archivo detalle');
+	
 	assign(txt, 'alumnos_detalle.txt');
 	reset(txt);
 
@@ -104,19 +96,19 @@ end;
 
 procedure leer(var det: detalle; var a_det: alumnoDet);
 begin
-	  if (not eof(det)) then
+	if (not eof(det)) then
 		read(det, a_det)
-	  else
+	else
 		a_det.cod := valorAlto;
 end;
 
 // Actualiza los datos de un registro de un archivo maestro
-procedure actualizarDatos(var a: alumno; finalAprobado: boolean);
+procedure actualizarDatos(var a: alumno; finalAprobado: integer);
 begin
-	if (finalAprobado) then
+	if (finalAprobado = 0) then
 		a.cantFinalesAprobados := a.cantFinalesAprobados + 1
 	else
-		a.cantMateriasAprobadas := a.cantMateriasAprobadas + 1;
+		a.cantCursadasAprobadas := a.cantCursadasAprobadas + 1;
 end;
 
 
@@ -126,6 +118,8 @@ var
 	a: alumno;
 	a_det: alumnoDet;
 begin
+	writeln('entro a actualizar maestro');
+	
 	reset(mae); reset(det);
 
 	leer(det, a_det); // Lee un registro del archivo detalle
@@ -133,19 +127,51 @@ begin
 		read(mae, a); // Lee un registro del archivo maestro
 
 		while (a.cod <> a_det.cod) do
-			read(mae, a); // Mientras no encuentre al alumno a_cod se lo sigue buscando en el maestro (por definicion existe en él)
+			read(mae, a); // Mientras no encuentre al alumno a_cod se lo sigue buscando en el maestro (por definicion existe en él, no va a llegar a eof)
+
+		writeln('salio del while que busca el maestro');
 
 		while (a.cod = a_det.cod) do begin // Se queda en el cod del maestro hasta que no se encuentre mas ese mismo codigo en el detalle
 			actualizarDatos(a, a_det.aproboFinal);
 			leer(det, a_det);
 		end;
 
-		seek (mae, filepos(mae) -1 ); // Reubica el puntero: cuando se buscaba el cod del maestro el puntero quedo avanzado
-		write(mae, a); // Escribe la actualizacion en el archivo maestro
+		writeln('salio del while que busca todos los alumnos detalle con un codigo especifico');
 
+		seek (mae, filepos(mae) -1 ); // Reubica el puntero: cuando se buscaba el cod del maestro el puntero quedo avanzado
+		
+		writeln('hizo el seek');
+		
+		write(mae, a); // Escribe la actualizacion en el archivo maestro
+		
+		writeln('saliendo del while grande...');
 	end;
 
+	writeln('salio del while porque cod = valor alto');
+
 	close(mae); close(det);
+	
+	writeln('salio de actualizar maestro');
+end;
+
+
+// Lista los alumnos que tengan más de cuatro materias con cursada aprobada pero no aprobaron el final
+Procedure listarAlumnos(var mae: maestro);
+var
+	txt: text;
+	a: alumno;
+begin
+	writeln('entro a listar alumnos');
+
+	assign(txt,'alumnos_con_mas_de_4_cursadas.txt');
+	rewrite(txt);
+	reset(mae);
+	while (not eof(mae)) do begin
+		read(mae, a);
+		if (a.cantCursadasAprobadas > 4) then
+			writeln(txt,'Codigo de alumno: ',a.cod,' - Nombre y apellido: ',a.nombre,' ',a.apellido,' - Cantidad de cursadas aprobadas: ',a.cantCursadasAprobadas,' - Cantidad de finales aprobados: ',a.cantFinalesAprobados);
+	end;
+	close(txt); close(mae);
 end;
 
 
@@ -155,7 +181,9 @@ var
 	mae: maestro;
 	det: detalle;
 begin
+
 	crearArchivoMaestro(mae);
 	crearArchivoDetalle(det);
 	actualizarMaestro(mae, det);
+	listarAlumnos(mae);
 end.
