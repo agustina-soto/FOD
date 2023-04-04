@@ -146,6 +146,9 @@ begin
 	assign(txt,'alumnos_con_mas_de_4_cursadas.txt');
 	rewrite(txt);
 	reset(mae);
+	
+	writeln('Alumnos con más de cuatro materias con cursada aprobada pero no aprobaron el final: ');
+	
 	while (not eof(mae)) do begin
 		read(mae, a);
 		if (a.cantCursadasAprobadas > 4) then begin
