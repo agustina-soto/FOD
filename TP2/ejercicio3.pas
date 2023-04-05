@@ -41,7 +41,7 @@ type
 	detalle = file of producto_det;
 
 	info_sucursales = array[rango] of detalle;
-	prod_det_minimos = array [rango] of producto_det;
+	prod_minimos = array [rango] of producto_det;
 
 // Asigna archivo logico con el fisico de 30 archivos detalle de productos
 procedure asignarDetalles(var v: info_sucursales);
@@ -52,14 +52,14 @@ end;
 
 
 // Crea 30 detalles de productos
-procedure abrirDetalles(var v: info_sucursales);
+procedure crearDetalles(var v: info_sucursales);
 begin
 	for i := 1 to SUCURSALES do
 		rewrite(v[i]);
 end;
 
 
-// Abre 30 detalles de productos
+// Abre 30 detalles de productos --> es necesario o lo puedo borrar?????????
 procedure abrirDetalles(var v: info_sucursales);
 begin
 	for i := 1 to SUCURSALES do
@@ -78,7 +78,7 @@ end;
 
 
 // Lee un archivo detalle: si es eof setea en valorAlto, sino devuelve el registro que se leyo
-procedure leer (var det: detalle; var prod: producto_det);
+procedure leerDetalle (var det: detalle; var prod: producto_det);
 begin
 	if (not eof(det)) then
 		read(det, prod)
@@ -88,58 +88,75 @@ end;
 
 
 // Busca los produtos minimos de todos los archivos de un vector y los almacena en un vector de productos minimos
-procedure guardarMinimos(var v: info_sucursales; var vMin: productos_det_minimos);
+procedure guardarMinimos(var vSucursales: info_sucursales; var vMin: prod_minimos);
 var
 	i: integer;
-	prod: producto;
 begin
 	for i := 1 to SUCURSALES do begin
-		leer(v[i], prod); //con i en 1 lee el prime producto del primer archivo, con i en 2 lee el primer producto del segundo archivo, etc
-		vMin[i] := prod;
+		Reset(vSucursales[i]);
+		leer(vSucursales[i], vMin[i]); // Lee (sobre el archivo que acaba de abrir) el primer producto y lo carga en vMin[posDondeSeLeyo]
+									  // Con i en 1 lee el prime producto del primer archivo, con i en 2 lee el primer producto del segundo archivo, etc
 	end;
 end;
 
 
 // Busca el codigo de producto minimo entre los 30 archivos detalle de un vector recibido y lo devuelve en el parametro "min"
-procedure minimo(var vMin: prod_det_minimos; var min: producto_det);
+procedure minimo(var vSucursales: info_sucursales; var vMin: prod_minimos; var min: producto_det);
 var
 	i: integer;
-	prod: producto_det;
+	posMin: integer;
 begin
-	min.cod := 9999;
-	for i := 1 to SUCURSALES do
-		if (vMin[i].cod <> valorAlto) then
-			if (vMin[i].cod < min.cod) then begin
-				min := prod;
-				leer(v[i], prod); // lee un producto en el vector en la posMin
-				vMin[i] := prod;
-			end;
+	min := vMin[1]; // Agarra el primer producto del primer detalle -- > que pasa si es eof? es legal agarrar v[i]?
+	posMin := 1; // Agarra la posicion donde se encuentra el producto min
+	for i := 2 to SUCURSALES do begin // Compara el min contra todos los primeros productos de todos los detalles
+		if (v[i].cod < min.cod) then begin
+			min := v[i];
+			posMin := i;
+		end;
+	end;
+	writeln('EL MINIMO ESTA EN EL ARCHIVO "Sucursal ',posMin. '"');
+	leerDetalle(vSucursales[posMin], vMin[posMin]); // Repone el producto leido en el vector de minimos y el otro queda guardado en min
 end;
 
 
-// Actualiza el stock del archivo maestro a partir de 30 detalles que se reciben como parametro
-procedure actualizarStock(var mae: maestro; v: info_sucursales);
+while (min.codigo <> valoralto) do begin
+	 aux:= min;
+	 total := 0;
+	 while (min.codigo = aux.codigo) do begin
+	 total := total + min.cant;
+	 minimo (det1, det2, det3,
+	 regd1, regd2, regd3, min);
+	 end;
+	 aux.cant := total;
+	 write (mae, aux);
+
+// Actualiza el stock del archivo maestro a partir de 30 detalles que se reciben como parametro // actualizarStock
+procedure actualizarMaestro(var mae: maestro; var vSucursales: info_sucursales); // es necesario el v como var?
 var
 	prodMae: producto;
 	min: producto_det;
+	vMin: prod_minimos;
 begin
-	reset(mae); crearDetalles(v);
+	guardarMinimos(vSucursales, vMin); // Abre todos los archivos detalle de vSucursales
+	reset(mae);
 
-	minimo(vector, min);
-	while (min.cod <> valorAlto) do begin
+	minimo(vSucursales, vMin, min);
+	while (min.cod <> valorAlto) do begin // Mientras hay prod por procesar (cod solo es valorAlto cuando no hay mas productos en ningun detalle)
 		read(mae, prodMae);
 
-		while (prodMae.cod <> min.cod) do
+		while (prodMae.cod <> min.cod) do // Sale del while cuando encuentra en el maestro el mismo codigo de producto que se leyo en el detalle
 			read(mae, prodMae);
 
-		while (prodMae.cod = prod_det.cod) do begin
-			prodMae.stockDisp := prodMae.stockDisp - min.cantVendida;
-			minimo(det, min);
+		while (prodMae.cod = min.cod) do begin // Sale del while cuando cambia el codigo de producto de min (se acabaron las actualizaciones para ese producto)
+			prodMae.stockDisp := prodMae.stockDisp - min.cantVendida; // Actualiza el stock disponible del maestro
+			minimo(det, min); // Busca otro codigo de producto minimo entre todos los detalles
 		end;
-		
+
 		seek(mae, filepos(mae)-1);
 		write(mae, prodMae);
 	end;
+
+	cerrarDetalles(vSucursales); close(mae);
 
 end;
 
