@@ -1,4 +1,4 @@
-program crearArchivosBinarios;
+program crearArchivosDetallesProductos;
 
 type
   producto_det = record
