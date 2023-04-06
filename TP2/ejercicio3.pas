@@ -40,7 +40,7 @@ type
 	info_producto = record
 		nombre: cadena30;
 		descripcion: cadena60;
-		stock: integer;
+		stockDisp: integer;
 		precio: real;
 	end;
 
@@ -49,6 +49,7 @@ type
 
 	info_sucursales = array[rango] of detalle;
 	prod_minimos = array [rango] of producto_det;
+
 
 // Asigna archivos logicos con los fisicos (ya creados) de 30 archivos detalle de productos
 procedure asignarDetalles(var v: info_sucursales);
@@ -112,15 +113,22 @@ begin
 end;
 
 
-// Actualiza el stock disponible de un registro recibido
-procedure actualizarStock(var stockDisp: integer; stockMin: integer; cantVendida: integer);
+// Agrega la informacion de un producto al archivo de texto
+procedure agregarAtxt(var txt: text; prod: producto);
+var
+	infoProd: info_producto;
 begin
-	if (stockDisp - cantVendida < stockMin) then begin
-		writeln('---- No hay productos suficientes -----');
-		stockDisp := 0;
-	end
-	else
-		stockDisp := stockDisp - cantVendida;
+	with prod do begin
+		infoProd.nombre := nombre;
+		infoProd.descripcion := descripcion;
+		infoProd.stockDisp := stockDisp;
+		infoProd.precio := precio;
+	end;
+	with infoProd do begin
+		writeln(txt, 'Nombre del producto: ', nombre);
+		writeln(txt, 'Stock disponible: ', stockDisp, ' | Precio: ', precio:2:2, '| Descripcion: ', descripcion);
+		writeln('----------------------------');
+	end;
 end;
 
 
@@ -130,7 +138,11 @@ var
 	prodMae: producto;
 	min: producto_det;
 	vMin: prod_minimos;
+	txt: text;
 begin
+	assign(txt, 'productos_stockDisp_menor_stockMin.txt');
+	rewrite(txt); // Crea el archivo txt --> lo hace una sola vez, va cargandolo en el modulo actualizarStock
+
 	guardarMinimos(vSucursales, vMin); // Abre todos los archivos detalle de vSucursales y almacena los minimos de cada detalle en vMin
 	reset(mae);
 
@@ -142,16 +154,21 @@ begin
 			read(mae, prodMae);
 
 		while (prodMae.cod = min.cod) do begin // Sale del while cuando cambia el codigo de producto de min (se acabaron las actualizaciones para ese producto)
-			actualizarStock(prodMae.stockDisp, prodMae.stockMin, min.cantVendida);
+			prodMae.stockDisp := prodMae.stockDisp - min.cantVendida;
 			minimo(vSucursales, vMin, min); // Busca otro codigo de producto minimo entre todos los detalles
 		end;
+
+		if (prodMae.stockDisp < prodMae.stockMin) then
+			agregarAtxt(txt, prodMae); // Actualiza el stock disponible
 
 		seek(mae, filepos(mae)-1);
 		write(mae, prodMae);
 	end;
 
-	cerrarDetalles(vSucursales); close(mae);
+	cerrarDetalles(vSucursales); close(mae); close(txt);
 end;
+
+
 
 // ---------------------------------------------------------------------
 var
@@ -161,8 +178,4 @@ begin
 	assign(mae, 'productos maestro'); // Abre y cierra el maestro en el modulo
 	asignarDetalles(vSucursales);
 	actualizarMaestro(mae, vSucursales); // En este modulo se carga el vector de minimos
-
-	exportarArchivo(vSucursales); // Hace un merge entre los archivos de todas las sucursales y devuelve la info en un archivo de texto
-
-	writeln('saliendo del programa sin errores');
 end.
