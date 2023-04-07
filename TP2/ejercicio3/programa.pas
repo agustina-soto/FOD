@@ -133,14 +133,12 @@ end;
 
 
 // Actualiza el stock del archivo maestro a partir de 30 detalles que se reciben como parametro
-procedure actualizarMaestro(var mae: maestro; var vSucursales: detalles);// var txt: text);
+procedure actualizarMaestro(var mae: maestro; var vSucursales: detalles; var txt: text);
 var
 	prodMae: producto;
 	min: producto_det;
 	vMin: prod_minimos;
-	txt: text;
 begin
-	assign(txt, 'productos_stockDisp_menor_stockMin.txt');
 	rewrite(txt); // Crea el archivo txt --> lo hace una sola vez, va cargandolo en el modulo actualizarStock
 
 	guardarMinimos(vSucursales, vMin); // Abre todos los archivos detalle de vSucursales y almacena los minimos de cada detalle en vMin
@@ -174,8 +172,10 @@ end;
 var
 	mae: maestro;
 	vSucursales: detalles; // tiene los detalles
+	txt: text;
 begin
 	assign(mae, 'productos maestro'); // Abre y cierra el maestro en el modulo
 	asignarDetalles(vSucursales);
-	actualizarMaestro(mae, vSucursales); // En este modulo se carga el vector de minimos
+	assign(txt, 'productos_stockDisp_menor_stockMin.txt');
+	actualizarMaestro(mae, vSucursales, txt); // En este modulo se carga el vector de minimos
 end.
