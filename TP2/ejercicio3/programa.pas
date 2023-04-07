@@ -47,12 +47,12 @@ type
 	maestro = file of producto;
 	detalle = file of producto_det;
 
-	info_sucursales = array[rango] of detalle;
+	detalles = array[rango] of detalle;
 	prod_minimos = array [rango] of producto_det;
 
 
 // Asigna archivos logicos con los fisicos (ya creados) de 30 archivos detalle de productos
-procedure asignarDetalles(var v: info_sucursales);
+procedure asignarDetalles(var v: detalles);
 var
 	i: integer;
 begin
@@ -62,7 +62,7 @@ end;
 
 
 // Cierra 30 detalles de productos
-procedure cerrarDetalles(var v: info_sucursales);
+procedure cerrarDetalles(var v: detalles);
 var
 	i: integer;
 begin
@@ -82,7 +82,7 @@ end;
 
 
 // Busca los produtos minimos de todos los archivos de un vector y los almacena en un vector de productos minimos
-procedure guardarMinimos(var vSucursales: info_sucursales; var vMin: prod_minimos);
+procedure guardarMinimos(var vSucursales: detalles; var vMin: prod_minimos);
 var
 	i: integer;
 begin
@@ -95,7 +95,7 @@ end;
 
 
 // Busca el codigo de producto minimo entre los 30 archivos detalle de un vector recibido y lo devuelve en el parametro "min"
-procedure minimo(var vSucursales: info_sucursales; var vMin: prod_minimos; var min: producto_det);
+procedure minimo(var vSucursales: detalles; var vMin: prod_minimos; var min: producto_det);
 var
 	i: integer;
 	posMin: integer;
@@ -133,7 +133,7 @@ end;
 
 
 // Actualiza el stock del archivo maestro a partir de 30 detalles que se reciben como parametro
-procedure actualizarMaestro(var mae: maestro; var vSucursales: info_sucursales);// var txt: text);
+procedure actualizarMaestro(var mae: maestro; var vSucursales: detalles);// var txt: text);
 var
 	prodMae: producto;
 	min: producto_det;
@@ -173,7 +173,7 @@ end;
 // ---------------------------------------------------------------------
 var
 	mae: maestro;
-	vSucursales: info_sucursales; // tiene los detalles
+	vSucursales: detalles; // tiene los detalles
 begin
 	assign(mae, 'productos maestro'); // Abre y cierra el maestro en el modulo
 	asignarDetalles(vSucursales);
