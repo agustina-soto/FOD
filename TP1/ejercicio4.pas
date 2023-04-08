@@ -60,7 +60,7 @@ end;
 // Crea un archivo de empleados, le asigna un nombre fisico ingresado por el usuario y lo carga con datos ingresados por teclado
 procedure crearArchivo(var arch: archEmpleados; var nombre_fisico: cadena20; var existe: boolean);
 begin
-	writeln('Usted eligio la opcion "crear un archivo"');
+	writeln('Se eligio la opcion "crear un archivo"');
 	existe := true;
 	writeln('Ingrese el nombre del archivo');
 	readln(nombre_fisico);
@@ -191,7 +191,7 @@ var
 	existe: boolean;
 begin
 	existe := false;
-	writeln('Usted eligio la opcion "Agregar empleado"');
+	writeln('Se eligio la opcion "Agregar empleado"');
 	leerEmpleado(e);
 	nuevoEmp := e; // Como hago para no necesitar las dos variables leyendo el empleado una sola vez? :(
 	existeEmpleado(arch, e, existe);
@@ -297,7 +297,7 @@ var
 	opcion: char;
 	nombre_arch: cadena20;
 begin
-	writeln('Usted eligio la opcion "abrir archivo creado anteriormente"');
+	writeln('Se eligio la opcion "abrir archivo creado anteriormente"');
 	if (existeArchivo) then begin
 		writeln('Ingrese el nombre del archivo que quiere abrir');
 		readln(nombre_arch);
@@ -345,5 +345,5 @@ begin
 		end;
 		mostrarMenuPrincipal(opcion);
 	end;
-	writeln('Usted eligio la opcion "salir del menu"');
+	writeln('Se eligio la opcion "salir del menu"');
 end.
