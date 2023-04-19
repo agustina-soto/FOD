@@ -38,6 +38,7 @@ begin
   m.nombre_cepa := 'Cepa ' + IntToStr(m.cod_cepa);
 end;
 
+
 begin
   // Asignar nombre y ruta al archivo maestro
   Assign(archivo, 'maestro_municipios_covid');
@@ -46,7 +47,7 @@ begin
   Rewrite(archivo);
 
   // Generar y escribir datos aleatorios en el archivo maestro
-  for i := 1 to 10 do begin
+  for i := 1 to 4 do begin
     for j := 1 to 3 do begin
       m.cod_localidad := i; // 1 //1 //1 //2 //2
       m.cod_cepa := j;     // 1 //2 //3 // 1 //2
