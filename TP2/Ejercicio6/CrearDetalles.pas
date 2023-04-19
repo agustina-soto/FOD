@@ -2,7 +2,6 @@ program crearDetalles;
 
 type
   cadena40 = string[40];
-  rango = 1..3;
 
   contadorCasos = record
     cant_activos: integer;
