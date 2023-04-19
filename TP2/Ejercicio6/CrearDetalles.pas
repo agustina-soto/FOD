@@ -47,10 +47,11 @@ begin
   Rewrite(archivo4);
 
   // Generar y escribir datos aleatorios en cada archivo detalle
-  for i := 1 to 10 do begin
+  for i := 1 to 4 do begin
     for j := 1 to 3 do begin
       m.cod_localidad := i;
       m.cod_cepa := j;
+      //writeln('cod_cepa = ', m.cod_cepa);
       generarDatosAleatorios(m);
       case j of
         1: write(archivo1, m);
@@ -58,6 +59,7 @@ begin
         3: write(archivo3, m);
       end;
     end;
+    
     // Escribir en el cuarto archivo detalle
     m.cod_localidad := i;
     m.cod_cepa := 4;
