@@ -2,13 +2,12 @@ program ejercicio3;
 const
 	VALOR_ALTO = -1;
 type
-	cadena40 = string[40];
 	cadena20 = string[20];
 
 	novela = record
 		cod: integer;
 		genero: cadena20;
-		nombre: cadena40;
+		nombre: cadena20;
 		duracion: integer;
 		director: cadena20;
 		precio: real;
@@ -45,7 +44,7 @@ procedure cargarDatos(var archivo: novelas);
 var
 	n: novela;
 begin
-	n.cod := 0; n.genero := ''; n.nombre := ''; n.duracion := 0; n.director := ''; n.precio := 0; // Cabecera del archivo
+	n.cod := 0; n.genero := '...'; n.nombre := '...'; n.duracion := 0; n.director := '...'; n.precio := 0; // Cabecera del archivo
 	while (n.cod <> VALOR_ALTO) do begin
 		write(archivo, n);
 		leerNovela(n);
@@ -56,7 +55,7 @@ end;
 // Crea un archivo, le asigna un nombre fisico ingresado por el usuario y lo carga con datos ingresados por teclado
 procedure crearArchivo(var archivo: novelas; var nombre_fisico: cadena20; var existe: boolean);
 begin
-	writeln('Usted eligio la opcion "crear un archivo"');
+	writeln('Eligio la opcion "crear un archivo"');
 	existe := true;
 	writeln('Ingrese el nombre del archivo');
 	readln(nombre_fisico);
@@ -66,6 +65,8 @@ begin
 	close(archivo);
 end;
 
+// Uso este modulo?????? 
+//
 // Lee un archivo: si es eof setea en VALOR_ALTO, sino devuelve el registro que se leyo
 procedure leer (var archivo: novelas; var info: novela);
 begin
@@ -80,45 +81,18 @@ procedure existeNovela(var archivo: novelas; var n: novela; var existe: boolean)
 var
 	num: integer;
 begin
-    num := e.cod; existe := false;
+    num := n.cod; existe := false;
     seek(archivo, 0);
 	while ( (not existe) AND (not eof(archivo)) ) do begin
 		read(archivo, n);
-		if (e.cod = num) then
+		if (n.cod = num) then
 			existe := true;
-	end;
-end;
-
-// Lista los datos de los empleados
-procedure listarDatosEmpleado(e: empleado);
-begin
-	writeln;
-	with e do begin
-		write('-> NOMBRE: ', nombre, ' | ');
-		write('APELLIDO: ', apellido, ' | ');
-		write('NRO DE EMPLEADO: ', nroEmpleado, ' | ');
-		write('EDAD: ', edad, ' | ');
-		write('DNI: ', dni, ' | ');
-		writeln;
-	end;
-end;
-
-// Lista datos de los empleados de un archivo
-procedure listarEmpleados(var archivo: novelas);
-var
-	e: empleado;
-begin
-	writeln('EMPLEADOS REGISTRADOS EN EL ARCHIVO: ');
-	while (not eof(archivo))do begin
-		read(archivo, e);
-		writeln;
-		listarDatosEmpleado(e);
 	end;
 end;
 
 
 // Muestra en pantalla el menu de modificaciones que se le puede hacer a la informacion de una novela
-procedure mostrarMenuModificaciones(var opcion: integer);
+procedure mostrarMenuModificaciones(var opcion: char);
 begin
 	writeln('---- MENU: MODIFICACIONES DATOS NOVELA ---- ');
 	writeln('1: Modificar genero');
@@ -135,26 +109,17 @@ end;
 // Modifica la informacion de una novela recibida
 procedure modificarCampos(var n: novela);
 var
-	opcion: integer;
+	opcion: char;
 begin
 	mostrarMenuModificaciones(opcion);
-	while (opcion <> 0) do begin
+	while (opcion <> '0') do begin
+		writeln('Ingrese la informacion actualizada');
 		case (opcion) of
-			1: 	writeln('Ingrese el genero actualizado');
-				readln(auxStr);
-				n.genero := auxStr;
-			2:	writeln('Ingrese el nombre actualizado');
-				readln(auxStr);
-				n.nombre := auxStr;
-			3:	writeln('Ingrese la duracion actualizada');
-				readln(auxInt);
-				n.duracion := auxInt;
-			4:	writeln('Ingrese el director actualizado');
-				readln(auxStr);
-				n.director := auxStr;
-			5: 	writeln('Ingrese el precio actualizado');
-				readln(auxReal);
-				n.precio := auxReal;
+			'1': readln(n.genero);
+			'2': readln(n.nombre);
+			'3': readln(n.duracion);
+			'4': readln(n.director);
+			'5': readln(n.precio);
 		end;
 		mostrarMenuModificaciones(opcion);
 	end;
@@ -164,7 +129,6 @@ end;
 //Modifica la edad de un empleado
 procedure modificarDatos(var archivo: novelas);
 var
-	edad: integer;
 	n: novela;
 	existe: boolean;
 begin
@@ -175,7 +139,7 @@ begin
 
 	if (existe) then begin // Si existe, en "n" queda cargado el registro buscado y el puntero se quedo apuntando al elemento siguiente del mismo
 		modificarCampos(n);
-        seek(archivo, filePos(arch)-1); // Se posiciona en la posicion del registro a modificar
+        seek(archivo, filePos(archivo)-1); // Se posiciona en la posicion del registro a modificar
         write(archivo, n); // Modifica el elemento el archivo
 		writeln('Se actualizo la informacion de la novela indicada');
 	end
@@ -183,84 +147,9 @@ begin
 		writeln('No se pudo actualizar la informacion. El codigo de novela ingresado no existe');
 end;
 
-// Agrega una novela al archivo (si esa novela no existe)
-procedure agregarNovela(var archivo: novelas);
-var
-	n, nuevaN: novela;
-	existe: boolean;
-begin
-	writeln('Usted eligio la opcion "Dar de alta una novela"');
-	leerNovela(n);
-	nuevaN := n;
-	existeNovela(archivo, n, existe);
-	if (existe) then
-        writeln('No se pudo agregar la novela. El codigo de novela ya esta registrado')
-    else begin
-		// seek(arch, filePos(arch)); --> No se hace el seek porque por la busqueda el archivo quedo posicionado al final del archivo (no en el ultimo elem sino despues)
-		write(archivo, nuevaN);
-		writeln('Se ha agregado una novela');
-	end
-end;
-
-
-procedure alta(var name:archivo);
-var
-    cabeceraLista,novela:infoArchivo;
-begin
-    leerNovela(novela);
-    if (not existeNovela(name,novela.codigo)) then begin
-        reset(name);
-        read(name,cabeceraLista);
-        if (cabeceraLista.codigo=0) then begin // si el primer registro es 0, es porque no hay espacio libre y agrego al final
-            seek(name,filesize(name));
-            write(name,novela);        
-        end
-        else begin
-            seek(name,(cabeceraLista.codigo*-1)); // me posiciono en el espacio libre de la lista. Por ejemplo, si el codigo de la cabecera es -4: -4*-1:4 -> me posiciono en el 4
-            read(name,cabeceraLista); //leo lo que habia en el espacio libre: indice hacia la siguiente posicion libre
-            seek(name,filepos(name)-1); //vuelvo al espacio libre
-            write(name,novela); // escribo en el espacio libre la novela
-            seek(name,0); //voy al principio
-            write(name,cabeceraLista);//guardo el indice a la siguiente posicion libre en la cabecera de la lista
-        end;
-        writeln('Novela dada de alta.');
-        close(name);
-    end
-    else begin
-        writeln('Ya existe una novela con ese codigo.');
-    end;
-end;
-
-
-
-
-
-// Carga los datos de un empleado en el archivo de texto traido por parametro
-procedure cargarArchivoTxt(var txt: text; emp: empleado);
-begin
-	with emp do
-		writeln(txt, ' Nro Empleado: ' , nroEmpleado , ' | Apellido: ' , apellido , ' | Nombre: ' , nombre , ' | DNI: ' , dni , ' | Edad: ' , edad); // Escribe en el archivo de texto
-end;
-
-// Crea un archivo de texto a partir de un archivo binario
-procedure exportarArchivoTxt(var archivo: novelas);
-var
-	emp: empleado;
-	txt: text;
-begin
-	assign(txt, 'todos_empleados.txt');
-	rewrite(txt); // Crea el archivo de texto “todos_empleados.txt”
-	while (not eof(archivo))do begin
-		read(archivo, emp); // Lee un elemento del archivo binario
-		cargarArchivoTxt(txt, emp);
-	end;
-	writeln('Se cargo el archivo de texto');
-	close(txt);
-end;
-
 
 // Es maso lo mismo que el proceso existeNovela, tendria q haber adaptado el codigo viejo para usar esta funcion pero me dio paja :)
-function existe(var archivo: novelas; cod: integer) : boolean
+function existe(var archivo: novelas; cod: integer) : boolean;
 var
 	found: boolean;
 	n: novela;
@@ -274,28 +163,80 @@ begin
 end;
 
 
+// Agrega una novela al archivo (si esa novela no existe)
+procedure agregarNovela(var archivo: novelas);
+var
+	n, cabecera, aux: novela;
+begin
+	writeln('Eligio la opcion "Dar de alta una novela"');
+	leerNovela(n);
+
+	if (existe(archivo, n.cod)) then
+        writeln('No se pudo agregar la novela. El codigo de novela ya esta registrado')
+    else begin
+		seek(archivo, 0); // Se posiciona en la cabecera
+		read(archivo, cabecera);
+		
+		if (cabecera.cod = 0) then begin // No hay espacios libres, hay que agregar al final
+			seek(archivo, fileSize(archivo)); // Se posiciona al final del archivo
+			write(archivo, n); // Agrega un registro
+			writeln('No habia espacios libres. Se agrego al final');
+		end
+		else begin
+			seek(archivo, cabecera.cod*-1); // Se posiciona en el primer espacio libre
+			read(archivo, aux); // Leo el contenido que hay en la posicion sobre la que voy a insertar el nuevo elemento
+			seek(archivo, 0); // Vuelvo a la cabecera para actualizarla
+			write(archivo, aux); // Escribe el nuevo primer espacio libre
+			seek(archivo, cabecera.cod*-1);
+			write(archivo, n);
+
+			writeln('Se ha agregado una novela');
+		end;
+	end;
+end;
+
+
+// Carga los datos de un empleado en el archivo de texto traido por parametro
+procedure cargarArchivoTxt(var txt: text; n: novela);
+begin
+	with n do
+		writeln(txt, ' Cod novela: ' , cod , ' | Genero: ' , genero); // Escribe en el archivo de texto
+end;
+
+// Crea un archivo de texto a partir de un archivo binario
+procedure exportarArchivoTxt(var archivo: novelas);
+var
+	n: novela;
+	txt: text;
+begin
+	assign(txt, 'novelas.txt');
+	rewrite(txt); // Crea el archivo de texto
+	while (not eof(archivo))do begin
+		read(archivo, n); // Lee un elemento del archivo binario
+		cargarArchivoTxt(txt, n);
+	end;
+	writeln('Se cargo el archivo de texto');
+	close(txt);
+end;
+
+
 // Elimina un registro del archivo
 procedure eliminarNovela(var archivo: novelas);
 var
-	n, cabecera: novela;
+	cabecera: novela;
 	codAEliminar: integer;
-	found: boolean;
 begin
 	writeln('Ingrese el codigo de novela que quiere eliminar');
 	readln(codAEliminar);
-	found := false;
-	
-	read(archivo, cabecera); // Guarda la cabecera
-    while (not eof(archivo)) AND (not found) do begin
-        read(archivo, n);
-        if (n.cod = codAEliminar) then found := true;
-    end;
 
-	if (found) then begin // Si encontró el codigo de novela
+	// ESTO DEBERIA IR ADENTRO DEL IF O ES IRRELEVANTE?
+	read(archivo, cabecera); // Guarda la cabecera
+
+	if (existe(archivo, codAEliminar)) then begin // Si encontró el codigo de novela
 		seek (archivo, filePos(archivo)-1 ); // Se posiciona en el archivo a eliminar
         write(archivo, cabecera); // Escribe en la posicion a borrar la informacion que tenia la cabecera
         cabecera.cod := (filePos(archivo)-1 ) * -1; // Convierte el indice de la posicion a negativo
-        seek(name, 0); // Se posiciona en la cabecera
+        seek(archivo, 0); // Se posiciona en la cabecera
         write(archivo, cabecera); // Reemplaza el registro cabecera con el del registro que se acaba de eliminar
         writeln('Se elimino la novela ingresada');
     end
@@ -339,7 +280,7 @@ begin
 		'1': agregarNovela(archivo);
 		'2': modificarDatos(archivo);
 		'3': eliminarNovela(archivo);
-		'4': listar....(archivo); // COMPLETAR ESTA LINEA CON LO QUE COREEPSONDAAAAA!!!!
+		'4': exportarArchivoTxt(archivo);
 	end;
 end;
 
@@ -347,7 +288,6 @@ end;
 procedure abrirArchivoCreado(var archivo: novelas; nombre_fisico: cadena20; existeArchivo: boolean);
 var
 	opcion: char;
-	nombre_arch: cadena20;
 begin
 	writeln('Eligio la opcion "abrir archivo creado anteriormente"');
 	if (existeArchivo) then begin
@@ -358,7 +298,7 @@ begin
 		readln(opcion);
 		while ( (opcion <> 'S') and (opcion <> 's') ) do begin
 			operacionesDelArchivo(archivo);
-			seek(archivo, filePos(archivo) - fileSize(archivo));
+			seek(archivo, 0);
 			writeln;
 			writeln('¿QUIERE VOLVER AL MENU PRINCIPAL?'); writeln('S: Si'); writeln('N: No');
 			readln(opcion);
@@ -366,8 +306,8 @@ begin
 		close(archivo);
 	end
 	else begin
-		// writeln; // CHEQUEAR SI ACA FUNCIONA EL #10!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		writeln(#10, 'Aun no se creo un archivo de novelas.');
+		writeln;
+		writeln('Aun no se creo un archivo de novelas.');
 		writeln;
 	end;
 end;
