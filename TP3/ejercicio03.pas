@@ -97,7 +97,7 @@ end;
 
 
 // Recibe un archivo y un numero de novela y devuelve si existe en el archivo
-procedure existeNovela(var archivo: novelas; var n: novela; var existe: boolean); // "n" llega con el cod de novela a buscar, cuando existe = true en "e" queda la info del registro
+procedure existeNovela(var archivo: novelas; var n: novela; var existe: boolean); // "n" llega con el cod de novela a buscar, cuando existe = true en "n" queda la info del registro
 var
 	num: integer;
 begin
