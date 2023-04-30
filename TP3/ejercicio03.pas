@@ -45,6 +45,8 @@ var
 	n: novela;
 begin
 	n.cod := 0; n.genero := '...'; n.nombre := '...'; n.duracion := 0; n.director := '...'; n.precio := 0; // Cabecera del archivo
+	// tengo que inicializar todos o solo con el codigo alcanza?
+
 	while (n.cod <> VALOR_ALTO) do begin
 		write(archivo, n);
 		leerNovela(n);
@@ -65,16 +67,6 @@ begin
 	close(archivo);
 end;
 
-// Uso este modulo?????? 
-//
-// Lee un archivo: si es eof setea en VALOR_ALTO, sino devuelve el registro que se leyo
-procedure leer (var archivo: novelas; var info: novela);
-begin
-	if (not eof(archivo)) then
-		read(archivo, info)
-	else
-		info.cod := VALOR_ALTO;
-end;
 
 // Recibe un archivo y un numero de novela y devuelve si existe en el archivo
 procedure existeNovela(var archivo: novelas; var n: novela; var existe: boolean); // "n" llega con el cod de novela a buscar, cuando existe = true en "e" queda la info del registro
