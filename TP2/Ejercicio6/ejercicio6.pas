@@ -214,7 +214,6 @@ procedure exportarArchivoATxt(var arch: maestro; var txt: text);
 var
 	reg: info_mae;
 begin
-	writeln('entro a exportar maestro');
 	reset(arch); // Abre el archivo binario
 	assign(txt, 'maestro_municipios_covid.txt');
 	rewrite(txt); // Crea el archivo de texto
@@ -236,12 +235,9 @@ var
 	txt: text;
 	reg: municipio;
 begin
-	writeln('entro a exportar detalles');
 	for i := 1 to CANT_DETALLES do begin
-		writeln('va a asignar el archivo txt');
 		assign (txt, 'detalle_municipio_' + IntToStr(i) + '.txt');
 		rewrite(txt); reset(v[i]);
-		writeln('abrio el archivo txt (se supone)');
 		while (not eof(v[i])) do begin
 			read(v[i], reg);
 			writeln(txt, 'COD LOCALIDAD: ', reg.cod_localidad, ' - COD CEPA: ', reg.cod_cepa, ' -  CANT ACTIVOS: ', reg.cont.cant_activos,
