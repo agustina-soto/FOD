@@ -95,6 +95,9 @@ begin
 	close(mae); close(aux);
 	rename(mae, 'archivo_actualizado');
 end;
+{ Deberia haber hecho esto no?:
+	erase(mae);
+	rename(aux,'archivo_maestro');}
 
 
 
